@@ -1,0 +1,97 @@
+/*
+ * main.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include"external_eeprom.h"
+#include"uart.h"
+#include"password.h"
+#include"timer.h"
+#include "dc_motor.h"
+#include"buzzer.h"
+uint8 recv_byte;
+uint8 Tick=0;
+
+
+int main()
+{
+	SET_BIT(SREG,7);
+	uint8 check_word=0;
+	uint8 try =0;
+	init_uart();
+	i2c_init();/* initialize i2c*/
+	Init_Alarm();
+    Timer_int();
+	Init_Dc_Motor();
+	recv_byte=receive_byte();
+	while(recv_byte!=0x11);
+	while(check_word==0)
+	{
+	    check_word=password_first_time();
+	}
+	_delay_ms(1000);
+	while(1)
+	{
+        recv_byte=receive_byte();
+		if(recv_byte=='+')
+		{
+			change_password_mc2();
+			recv_byte=0;
+		}
+		else if(recv_byte=='-')
+		{
+			uint8 state;
+			state=Open_Door_Mc2();
+			recv_byte=receive_byte();
+			while(recv_byte !=0x10);/*wait until it receive 0x10 for synchronization*/
+			send_byte('o');
+			if(state==1)
+			{
+				TCNT0=6;
+				//_delay_ms(5);
+				try=0;/*put try = 0 here because if user  write a password wrong at first time */
+				/*open door for 10 sec ..just 4 Ticks mean 1 seconds  passed ..> 40 Ticks mean 10 sec passed */
+				//while(Tick <= 40 && Tick>0)
+				//{
+					Clk_Wise();
+					while(Tick!=0);
+					/*_delay_ms(10000);*/
+				//}
+				/*close door for 10sec*/
+				_delay_ms(60000);
+				//recv_byte=receive_byte();
+				//while(recv_byte !=0x11);
+				TCNT0=6;
+				send_byte('c');
+				while(Tick <= 40 && Tick>0)
+				{
+					Anti_Clk_Wise();
+					/*_delay_ms(10000);*/
+				}
+
+				send_byte('s');
+				/*Stop_Motor();*/
+			}
+			else if(state==0)
+			{
+				try++;
+				if(try==2)
+				{
+					try=0;
+				   	recv_byte=receive_byte();
+					while(recv_byte!=0x10);/*wait until it receive 0x10*/
+					send_byte('A');/*send to another mc that alarm will be worked here to show message on lcd that system will be locked*/
+					Alarm_On();
+					_delay_ms(60000);
+				}
+				Alarm_Off();
+
+			}
+		}
+
+
+
+	}
+}

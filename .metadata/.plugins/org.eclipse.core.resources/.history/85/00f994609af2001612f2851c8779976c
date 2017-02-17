@@ -1,0 +1,19 @@
+/*
+ * dc_motor.h
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#ifndef DC_MOTOR_H_
+#define DC_MOTOR_H_
+
+#include "macro.h"
+#include"micro_config.h"
+#include"std_types.h"
+
+#define DDIR_PORT_DC DDRD
+#define PORT_DC  PORTD
+#define Output1 PD4
+#define Output2 PD5
+#endif /* DC_MOTOR_H_ */

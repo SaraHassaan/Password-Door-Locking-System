@@ -1,0 +1,16 @@
+/*
+ * timer.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include "timer.h"
+void Timer_int()
+{
+	/*enable normal mode interrupt ,Ftimer=Fcpu/1028 ..choose pre scale=1028*/
+	TCCR0=(1<<FOC0)|(1<<CS02)|(1<<CS00);
+	TCNT0=0; //initial value
+    TIMSK|=(1<<TOIE0);// TOIE0 (Timer/Counter0 Overflow Interrupt Enable)
+
+}

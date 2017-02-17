@@ -1,0 +1,17 @@
+/*
+ * read_password_eeprom.h
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#ifndef READ_PASSWORD_EEPROM_H_
+#define READ_PASSWORD_EEPROM_H_
+
+#include "macro.h"
+#include"micro_config.h"
+#include"std_types.h"
+
+void read_password(uint16 address,uint8 *pass);
+
+#endif /* READ_PASSWORD_EEPROM_H_ */

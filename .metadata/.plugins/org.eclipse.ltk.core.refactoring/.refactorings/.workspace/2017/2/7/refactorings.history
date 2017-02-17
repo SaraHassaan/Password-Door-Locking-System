@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Delete resource &apos;MC2/check_password.h&apos;" deleteContents="false" description="Delete resource &apos;MC2/check_password.h&apos;" element1="/MC2/check_password.h" flags="7" id="org.eclipse.ltk.core.refactoring.delete.resources" resources="1" stamp="1486824990958"/>
+</session>

@@ -1,0 +1,15 @@
+/*
+ * dc_motor.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include"dc_motor.h"
+
+void Init_Dc_Motor()
+{
+	/*make 2 pins of mc that connected to 2 input of dc motor are output pins by set them*/
+	 SET_BIT(DDIR_PORT_DC,Line1 );
+	 SET_BIT(DDIR_PORT_DC,Line2 );
+}

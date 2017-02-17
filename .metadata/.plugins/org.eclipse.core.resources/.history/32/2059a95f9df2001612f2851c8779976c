@@ -1,0 +1,15 @@
+/*
+ * buzzer.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include"buzzer.h"
+
+void Init_Alarm()
+{
+	/*make the pin that connected to alarm is output*/
+	SET_BIT(REG,BIT)
+
+}

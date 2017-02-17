@@ -1,0 +1,38 @@
+15:31:39 **** Incremental Build of configuration Debug for project MC2 ****
+make all 
+Building file: ../main.c
+Invoking: AVR Compiler
+avr-gcc -Wall -g2 -gstabs -O0 -fpack-struct -fshort-enums -ffunction-sections -fdata-sections -std=gnu99 -funsigned-char -funsigned-bitfields -mmcu=atmega16 -DF_CPU=1000000UL -MMD -MP -MF"main.d" -MT"main.o" -c -o "main.o" "../main.c"
+In file included from ../micro_config.h:16,
+                 from ../external_eeprom.h:12,
+                 from ../main.c:8:
+e:/eclipse/lib/gcc/../../avr/include/util/delay.h:90:3: warning: #warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+Finished building: ../main.c
+ 
+Building target: MC2.elf
+Invoking: AVR C Linker
+avr-gcc -Wl,-Map,MC2.map -mmcu=atmega16 -o "MC2.elf"  ./buzzer.o ./dc_motor.o ./external_eeprom.o ./i2c.o ./main.o ./password.o ./timer.o ./uart.o   
+Finished building target: MC2.elf
+ 
+Invoking: AVR Create Extended Listing
+avr-objdump -h -S MC2.elf  >"MC2.lss"
+Finished building: MC2.lss
+ 
+Invoking: Print Size
+avr-size --format=avr --mcu=atmega16 MC2.elf
+AVR Memory Usage
+----------------
+Device: atmega16
+
+Program:    7582 bytes (46.3% Full)
+(.text + .data + .bootloader)
+
+Data:         18 bytes (1.8% Full)
+(.data + .bss + .noinit)
+
+
+Finished building: sizedummy
+ 
+
+15:31:40 Build Finished (took 472ms)
+

@@ -1,0 +1,132 @@
+/*
+ * password.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+#include"password.h"
+#include"uart.h"
+
+/*check if the password that you received from user is the same password that stored before at eeprom*/
+uint8 check_pass(uint8*recv,uint8*eeprom)
+{
+	uint8 flag=1;
+	uint8 i=0;
+	while(*recv != '\0')
+	{
+		if(*recv != *eeprom)
+		{
+			flag=0;
+		}
+		else
+		{
+
+		}
+		recv++;
+		eeprom++;
+        i++;
+	}
+	if(flag==1)
+	{
+		send_byte('T');
+	}
+	else if(flag==0)
+	{
+		send_byte('F');
+    }
+	return flag;
+}
+
+/*its read the true password from eeprom*/
+void read_password(uint16 address,uint8 *pass)
+{
+	//uint8 i =0 ;
+	read_eeprom(address,pass);
+	_delay_ms(10);
+	while(*pass != '\0')
+	{
+		address++;
+		pass++;
+		read_eeprom(address,pass);
+		_delay_ms(10);
+	}
+
+
+}
+
+/*store the password at eeprom*/
+void write_pass(uint16 address,uint8 *pass)
+{
+	while(*pass!='\0')
+	{
+		write_eeprom(address,*pass);/*address is the memory location that you want to write at it ..0x10 is the data that will be written in 0x0311..its the password of the door*/
+		_delay_ms(10);
+		address++; /*to get the next address to save the password in it*/
+		pass++;    /*to make the pointer point to the next location in array of password*/
+	}
+	write_eeprom(address,*pass);/*to write null at last of string*/
+	_delay_ms(10);
+
+}
+
+uint8 password_first_time()
+{
+
+	uint8 check;
+	uint8 str_recv[16];
+	uint8 read_eeprom[16];
+	recv_byte=receive_byte();
+	while(recv_byte!=0x11);/*if you receive it , you can receive the string from another mc*/
+	receive_string(str_recv);
+	write_pass(0x0001,str_recv);
+	recv_byte=receive_byte();
+	while(recv_byte!=0x11);/*if you receive it , you can receive the string from another mc*/
+	receive_string(str_recv);
+	read_password(0x0001,read_eeprom);
+	send_byte(0x11);
+	check=check_pass(str_recv,read_eeprom);
+	return check;
+}
+
+void change_password_mc2()
+{
+	uint8 check;
+	uint8 str_recv[16];/*this receive the characters that are sent from another mc*/
+	uint8 str_read_eeprom[16];
+	recv_byte=receive_byte();
+	while(recv_byte!=0x11);/*if you receive it (to be ready to recv string ), you can receive the string from another mc*/
+	receive_string(str_recv); /*receive a string(password that written by user) from another mc*/
+	/*this function read the password that stored at address 0x0001..and locate it in array str_read_eeprom*/
+	read_password(0x0001,str_read_eeprom);
+	recv_byte=receive_byte();
+	while(recv_byte!=0x11);
+	check=check_pass(str_recv,str_read_eeprom); /*check if user write the right password*/
+	if(check==1)
+	{
+		/*to be ready to receive from another mc(for recive new password)*/
+		recv_byte=receive_byte();
+	    while(recv_byte!=0x11);/*if you receive it  you can receive the string from another mc*/
+		receive_string(str_recv);
+		/*store a new password into eeprom at 0x0311*/
+		write_pass(0x0311,str_recv);
+		_delay_ms(10);
+		/*receive again the new password to check if its identical to the previous password in previous step */
+		recv_byte=receive_byte();
+		while(recv_byte!=0x11);/*if you receive it  you can receive the string from another mc*/
+		receive_string(str_recv);
+		/*read the new password that stored at 0x0311*/
+		read_password(0x0311,str_read_eeprom);
+		recv_byte=receive_byte();
+		while(recv_byte!=0x11);/*to be ready to send a byte to another mc*/
+		check=check_pass(str_recv,str_read_eeprom); /*check if user write the right password*/
+		/*write the new password into eeprom at address 0x0001*/
+		/*if(check==1)
+		{
+			write_pass(0x0001,str_read_eeprom);
+
+		}*/
+	}
+
+
+}
+

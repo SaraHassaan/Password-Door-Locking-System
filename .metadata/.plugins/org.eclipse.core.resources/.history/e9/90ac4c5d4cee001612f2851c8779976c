@@ -1,0 +1,27 @@
+/*
+ * check_password.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include"check_password.h"
+
+uint8 check_pass(uint8*recv,uint8*eeprom)
+{
+	uint8 flag=0;
+	while(*recv !='\0')
+	{
+		if(*recv != *eeprom)
+		{
+			flag=1;
+		}
+		else
+		{
+
+		}
+		recv++;
+		eeprom++;
+
+	}
+}

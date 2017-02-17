@@ -1,0 +1,51 @@
+/*
+ * main.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include"keypad.h"
+#include"lcd.h"
+#include"uart.h"
+#include "door.h"
+uint8 correct;
+int main()
+{
+	Timer_int();
+	uint8 key;
+	uint8 check_word='F';
+	Init_Lcd();/*initialize lcd*/
+	init_uart();
+	SET_BIT(SREG,7);/*enable global interrupt*/
+	send_byte(0x11);/*MC1 is ready to synchronize the next instructions with MC2*/
+	while(check_word=='F')
+	{
+		check_word= password_first_time();
+	}
+	Row_Col_string(0, 0 , "success is done");
+
+	_delay_ms(1000);
+	Clear_Lcd();
+	while(1)
+	{
+		Row_Col_string(0, 0 , "'+':change pass");
+		Row_Col_string(1, 0 , "'-':open door");
+		key= keypad_getPressedKey();
+		_delay_ms(500);
+		Clear_Lcd();
+		send_byte('R');
+		if(key=='+')
+		{
+			send_byte('+'); /*send '+' to another mc to know that i pressed on + to process password there to change it*/
+			change_password();
+		}
+		else if(key=='-')
+		{
+			send_byte('-');
+			Open_Door();
+
+		}
+
+	}
+}

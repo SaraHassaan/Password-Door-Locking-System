@@ -1,0 +1,207 @@
+/*
+ * door.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include"door.h"
+#include"lcd.h"
+#include"keypad.h"
+#include"uart.h"
+#include"timer.h"
+
+uint8 correct;
+uint8 try=0;
+uint8 Tick;
+uint8 flag_o;
+/*this function responsible for change password*/
+void change_password()
+{
+
+	/*its array contain 16 element each element is 8 bits ..
+	 * store keys that are pressed through keypad in this array
+	 */
+	uint8 str_written[16];
+	Clear_Lcd();
+	/*ask user to enter old password */
+    Row_Col_string(0, 0 , "enter old pass");
+    /*key_pressed ..>store pressed keys on array str_written*/
+	key_pressed(str_written);
+	send_byte(0x01);/*send it to MC2 to be sure there is synchronization between 2 MC*/
+	/*you send the password (old password)that is written(using keypad) to MC2 to check it
+	 * check if the password that is written now is exactly like to the password is stored at eeprom
+	 * */
+	send_string(str_written);
+    Clear_Lcd();
+    send_byte(0x11);
+    _delay_ms(100);/*wait MC2 To process on the written password  */
+    /*MC1 will receive char from MC2 ..received char will be done in ISR (interrupt service routine)
+     * when MC2 send a char To MC1 , it causes interrupt on MC1 ..PC switch into ISR of UART receive
+     * to execute the code there , after executed ISR , PC come back to the main code.
+     * correct variable is equal to the char that is transmitted by MC2
+     */
+    /*when MC2 process on the password that written by user
+     * MC2 send char if its correct password or not ..F is false password ..T its true
+     */
+    if(correct=='F')
+	{
+		Row_Col_string(0, 0 , "false password");
+		_delay_ms(1000);
+		//correct=0;
+    }
+    /*if user write the right old password , system will ask him to enter the new password and enter it again to confirm it*/
+	else if(correct=='T')
+	{
+	    Row_Col_string(0, 0 , "enter new pass");
+	    key_pressed(str_written);
+		send_byte(0x11);/*send it to MC2 to be sure there is synchronization between 2 mc*/
+		send_string(str_written);/*you send the new password that is written(using keypad) to MC2 */
+		Clear_Lcd();
+		Row_Col_string(0, 0 , "re-enter newpass");
+	    key_pressed(str_written);
+		send_byte(0x11);/*send it to another mc to be sure there is synchronization between 2 mc*/
+		send_string(str_written);/*send the re-enter password to MC2 to assure that its identical to the first new password */
+		Clear_Lcd();
+		correct=0;
+		send_byte(0x11);
+		_delay_ms(100);
+		/*if the first new password is identical to the retype password
+		 * system will tell you that password is changed. if they not identical
+		 * system will ask you to repeat this operation again
+		 */
+        if(correct=='T')
+        {
+        	Clear_Lcd();
+        	Row_Col_string(0, 0 , "pass is changed");
+        	_delay_ms(1000);
+        }
+        else if(correct =='F')
+        {
+        	Clear_Lcd();
+        	Row_Col_string(0, 0 , "repeat again");
+        	_delay_ms(1000);
+        }
+
+	}
+
+}
+/*this function send the password that written by user for opening door
+ * to MC1 to check it, if its right password or not
+ * if its right password ,MC1 will receive T then message "door is opened" will be showed on lcd
+ * for 10 sec then message "door is closed" will be showed for 10 sec
+ * but if user enter wrong password MC2 will send F then message"false password" will be showed on lcd for 1 sec
+ * if user try 2 times to enter wrong password ,message "System Locked" showed on lcd and system will enter in infinite loop
+ */
+
+void Open_Door()
+{
+
+	uint8 str_written[16];
+	Clear_Lcd();
+	Row_Col_string(0, 0 , "Enter Password");
+	key_pressed(str_written);
+	send_byte(0x12);/*send it to another mc to be sure there is synchronization between 2 mc*/
+	send_string(str_written);/*you send the password (old password)that is written(using keypad) to another mc to check it*/
+	Clear_Lcd();
+	send_byte(0x13);
+	_delay_ms(100);/*wait another mc transmitting data ..this mc will receive data in correct var */
+	send_byte(0x14);/*MC is ready to complete the next instructions*/
+	if(correct=='F')/*the received char from MC2 will be put in correct variable ..here correct is F so its false password*/
+	{
+		while(correct!='x');/*wait until MC2 is be ready*/
+        try++;
+        if(try<2)
+        {
+    	    Row_Col_string(0, 0 , "False Password");
+    	    _delay_ms(1000);
+        }
+	    if(try==2)
+	    {
+		    try=0;
+		    Clear_Lcd();
+		    send_byte(0x10);/*send that to another mc to make synchronization together*/
+		    while(correct !='A');/*when A is received that mean alarm will be worked*/
+		    Row_Col_string(0, 0 , "System Locked");
+		    _delay_ms(60000);
+		    Clear_Lcd();
+		    //while(1);
+	    }
+
+
+	}
+	else if(correct =='T')
+	{
+		try=0; /*put try = 0 here because if user  write a password wrong at first time */
+		send_byte(0x10);/*send it to another mc to be sure there is synchronization between the two Micro Controllers */
+		while(correct!='o');/*wait until o is received that mean door will be opened*/
+		Row_Col_string(0, 0 , "Door Opened");
+		while(correct!='c');
+		Row_Col_string(0, 0 , "Door Closed");
+		while(correct!='s');
+
+
+
+	}
+
+}
+
+/*its executed one time in that system(ask user to make password of door) ..it send the new password to MC2
+ * to store it in EEPROM
+ */
+uint8 password_first_time()
+{
+	uint8 str_written[16];
+	Row_Col_string(0, 0 , "enter new pass");
+	key_pressed(str_written);
+	send_byte(0x11);/*send it to another mc to be sure there is synchronization between 2 mc*/
+	send_string(str_written);/*you send the password that is written(using keypad) to another mc to check it*/
+	Clear_Lcd();
+	Row_Col_string(0, 0 , "re-enter pass");
+    key_pressed(str_written);
+	send_byte(0x11);/*send it to another mc to be sure there is synchronization between 2 mc*/
+	send_string(str_written);/*you send the password that is written(using keypad) to another mc to check it*/
+	Clear_Lcd();
+	while(correct!=0x11);
+	_delay_ms(50);
+	return correct; /* correct is T or F depends on if user make password correctly or not*/
+
+}
+/*this function is responsible for store the keys pressed on array str_written*/
+void key_pressed(uint8 *str_written)
+{
+	uint8 i=0;/*i indicate many of times you pressed on keypad when you write a password*/
+	uint8 key;
+	/*this function used to determine the location of cursor on lcd to see the char on lcd
+	 * 1,0  mean write on row number 1 and column number 0 on lcd
+	 */
+	Cursor_Location(1 , 0);
+	key= keypad_getPressedKey();
+	_delay_ms(500);
+	while( key != '=')/*when you pressed on '=' on keypad as you pressed on enter */
+	{
+		if(key==13) /*if you pressed on key number 13 that cause clear character on lcd*/
+		{
+		    clear_char();/*this function responsible for clear a character on lcd*/
+			i--;  /*decrement i that mean the number of pressed on keypad is decremented*/
+		}
+		else
+		{
+			/*store keys pressed at array*/
+			str_written[i]=key;
+			/*show '*' on lcd instead of showing actual characters because we write password*/
+			Lcd_Send_Data('*');
+			//Lcd_Send_Data(key);
+			i++;
+		}
+			key= keypad_getPressedKey();
+			_delay_ms(500);
+	 }
+		/*i =0 mean ..i dont press any or pressed on '=' that mean enter after press it system process if that right password or not */
+		if(i==0)
+		{
+		    str_written[i]=key;
+		    i++;
+		}
+		str_written[i]='\0';/*null is the end of any array of characters*/
+}

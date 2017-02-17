@@ -1,0 +1,29 @@
+/*
+ * timer.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include "timer.h"
+uint8 Tick;
+void Timer_int()
+{
+	/*enable (TIMER0)normal mode  ,Ftimer=Fcpu/1028 ..choose prescaler=1028*/
+	TCCR0=(1<<FOC0)|(1<<CS02)|(1<<CS00);
+	TCNT0=0; //initial value
+    TIMSK|=(1<<TOIE0);// TOIE0 (Timer/Counter0 Overflow Interrupt Enable)
+
+}
+ISR(TIMER0_OVF_vect)
+{
+	Tick++;
+	//TIFR &=~(1<<TOV0); //Timer/Counter0 Overflow Flag(automatic flag) myzt avr hwa by3mlhabzero b3d isr ma t5ls
+	if(Tick==40)
+	{
+		Stop_Motor();
+		Tick=0;
+	}
+}
+
+

@@ -1,0 +1,15 @@
+/*
+ * timer.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+
+void Timer_int()
+{
+	TCCR0=(1<<FOC0)|(1<<CS02); //3ashan ash3'l normal mode ll timer,clck prescale 256,
+	TCNT0=0; //initial value
+    TIMSK|=(1<<TOIE0);// TOIE0 (Timer/Counter0 Overflow Interrupt Enable)
+
+}

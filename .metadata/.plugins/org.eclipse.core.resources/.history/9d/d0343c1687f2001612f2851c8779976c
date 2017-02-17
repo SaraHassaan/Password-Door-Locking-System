@@ -1,0 +1,56 @@
+/*
+ * main.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include"keypad.h"
+#include"lcd.h"
+#include"uart.h"
+#include "door.h"
+uint8 correct;
+int main()
+{
+	uint8 key;
+	uint8 check_word='F';
+	Init_Lcd();
+	init_uart();
+	SET_BIT(SREG,7);
+	send_byte(0x11);
+	while(check_word=='F')
+	{
+		check_word= password_first_time();
+	}
+	Row_Col_string(0, 0 , "success is done");
+
+	_delay_ms(1000);
+	Clear_Lcd();
+	while(1)
+	{
+
+		//correct=0;
+		//send_byte(0x10);
+		Row_Col_string(0, 0 , "'+':change pass");
+		Row_Col_string(1, 0 , "'-':open door");
+		key= keypad_getPressedKey();
+		_delay_ms(500);
+		Clear_Lcd();
+		send_byte(0x10);
+		_delay_ms(5);
+		//Lcd_Send_Data(correct);
+
+		//_delay_ms(500);
+		if(key=='+')
+		{
+
+			send_byte('+');
+			_delay_ms(10);
+			//Clear_Lcd();
+			//Lcd_Send_Data(correct);
+			//_delay_ms(1000);
+			change_password();
+		}
+
+	}
+}

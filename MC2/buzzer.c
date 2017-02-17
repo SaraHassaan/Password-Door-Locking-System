@@ -1,0 +1,26 @@
+/*
+ * buzzer.c
+ *
+ *  Created on: ??þ/??þ/????
+ *      Author: Sara
+ */
+
+#include"buzzer.h"
+
+void Init_Alarm()
+{
+	/*make the pin that connected to alarm is output*/
+	SET_BIT(DDIR_ALARM,B1);
+	/*initial value of alarm is off*/
+	CLEAR_BIT(PORT_ALARM,B1);
+}
+
+void Alarm_On()
+{
+	SET_BIT(PORT_ALARM,B1);
+}
+
+void Alarm_Off()
+{
+	CLEAR_BIT(PORT_ALARM,B1);
+}

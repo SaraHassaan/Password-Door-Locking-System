@@ -1,0 +1,54 @@
+15:31:39 **** Incremental Build of configuration Debug for project MC1 ****
+make all 
+Building file: ../door.c
+Invoking: AVR Compiler
+avr-gcc -Wall -g2 -gstabs -O0 -fpack-struct -fshort-enums -ffunction-sections -fdata-sections -std=gnu99 -funsigned-char -funsigned-bitfields -mmcu=atmega16 -DF_CPU=1000000UL -MMD -MP -MF"door.d" -MT"door.o" -c -o "door.o" "../door.c"
+In file included from ../micro_config.h:16,
+                 from ../door.h:12,
+                 from ../door.c:8:
+e:/eclipse/lib/gcc/../../avr/include/util/delay.h:90:3: warning: #warning "Compiler optimizations disabled; functions from <util/delay.h> won't work as designed"
+../door.c: In function 'change_password':
+../door.c:28: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:49: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:56: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:62: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:78: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:84: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c: In function 'Open_Door':
+../door.c:104: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:119: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:128: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:141: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:143: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c: In function 'password_first_time':
+../door.c:158: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+../door.c:163: warning: pointer targets in passing argument 3 of 'Row_Col_string' differ in signedness
+Finished building: ../door.c
+ 
+Building target: MC1.elf
+Invoking: AVR C Linker
+avr-gcc -Wl,-Map,MC1.map -mmcu=atmega16 -o "MC1.elf"  ./door.o ./keypad.o ./lcd.o ./main.o ./timer.o ./uart.o   
+Finished building target: MC1.elf
+ 
+Invoking: AVR Create Extended Listing
+avr-objdump -h -S MC1.elf  >"MC1.lss"
+Finished building: MC1.lss
+ 
+Invoking: Print Size
+avr-size --format=avr --mcu=atmega16 MC1.elf
+AVR Memory Usage
+----------------
+Device: atmega16
+
+Program:   11412 bytes (69.7% Full)
+(.text + .data + .bootloader)
+
+Data:        233 bytes (22.8% Full)
+(.data + .bss + .noinit)
+
+
+Finished building: sizedummy
+ 
+
+15:31:39 Build Finished (took 523ms)
+
