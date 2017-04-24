@@ -1,8 +1,8 @@
 # Password-Door-Locking-System
-open door by using password
 
 
-Password-Door-Locking-System
+
+
 
     firstly ,system will ask you to make password for door this password will be stored at EEPROM.
 
