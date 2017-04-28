@@ -24,7 +24,7 @@
 
     if you enter the right password , dc-motor will work in clock wise direction for 10 sec to open door then it will work in anti clock wise direction to close door for 10 sec then dc-motor will stop.
 
-the total project includes 2 projects : MC1 and MC2
+the total project includes 2 projects : MC1 and MC2 (microcontroller avr-ATmega16 is used)
 
     MC1 is connected to LCD and Keypad,by using keypad you can enter the password LCD guide you what you should do and the result of what you enter .
 
